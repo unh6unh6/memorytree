@@ -2,10 +2,10 @@
 
 ## Phase 1. 프로젝트 기반 설정
 
-- [ ] 폴더 구조 설계 (`src/styles/`, `src/scripts/`, `src/components/`)
-- [ ] 공통 CSS 변수 작성 (색상, 타이포그래피, spacing, elevation)
-- [ ] Inter 폰트 및 CSS 리셋 적용
-- [ ] Hash-based SPA 라우터 구현 (`#explorer`, `#list`, `#test`)
+- [x] 폴더 구조 설계 (`src/styles/`, `src/scripts/`, `src/components/`)
+- [x] 공통 CSS 변수 작성 (색상, 타이포그래피, spacing, elevation)
+- [x] Inter 폰트 및 CSS 리셋 적용
+- [x] Hash-based SPA 라우터 구현 (`#explorer`, `#list`, `#test`)
 
 ## Phase 2. 데이터 레이어
 

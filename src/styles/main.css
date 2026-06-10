@@ -1,0 +1,21 @@
+@import './variables.css';
+@import './reset.css';
+
+/* ── App Shell ── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Views (페이지별 컨테이너, Phase 3+ 에서 채워짐) ── */
+.view {
+  display: none;
+  flex: 1;
+  overflow: hidden;
+}
+
+.view.active {
+  display: flex;
+}
