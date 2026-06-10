@@ -6,6 +6,7 @@ import * as sidebar from './sidebar.js';
 import * as modal from './modal.js';
 import * as toast from './toast.js';
 import * as canvas from './canvas.js';
+import * as list from './list.js';
 
 // root 노드 보장 → 샘플 데이터 삽입 (최초 1회)
 initRootNode();
@@ -28,8 +29,7 @@ router.onRoute('explorer', () => {
 });
 
 router.onRoute('list', (params) => {
-  // Phase 5에서 구현
-  // params.nodeId — 선택된 노드
+  list.init(document.getElementById('list-container'), params.nodeId);
 });
 
 router.onRoute('test', (params) => {
