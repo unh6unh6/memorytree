@@ -357,6 +357,16 @@ function _bindEvents() {
       render();
     });
   });
+
+  // 빈 영역 클릭 시 선택 해제 + 캔버스 동기화
+  _container.addEventListener('click', (e) => {
+    if (e.target.closest('.sidebar__item')) return;
+    if (!(_selectedId || _selectedIds.size > 0)) return;
+    _selectedIds.clear();
+    _selectedId = null;
+    render();
+    document.dispatchEvent(new CustomEvent('sidebar:multiselect', { detail: { ids: [] } }));
+  });
 }
 
 // ─── Public select (canvas→sidebar 동기화) ───────────────────────────────────

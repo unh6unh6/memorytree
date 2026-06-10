@@ -4,9 +4,9 @@ import * as toast from './toast.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ROOT_R       = 42;
-const NODE_W       = 164;
-const NODE_H       = 48;
-const LEVEL_SPACE  = 210;
+const NODE_W       = 168;
+const NODE_H       = 52;
+const LEVEL_SPACE  = 160;
 const ADD_BTN_R    = 12;
 
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -65,6 +65,10 @@ export function init(container) {
     document.addEventListener('sidebar:multiselect', (e) => {
       _selectedIds = new Set(e.detail.ids);
       _selectedId  = e.detail.ids[e.detail.ids.length - 1] || null;
+      if (e.detail.ids.length === 0 && _panelEl) {
+        _panelEl.hidden = true;
+        _hideCanvasCtxPanel();
+      }
       _render();
     });
     // 사이드바 리사이즈 → _tx 보정으로 노드 화면 위치 고정
@@ -295,12 +299,7 @@ function _bindPanZoom() {
 
   _svgEl.addEventListener('click', () => {
     if (_didPan) { _didPan = false; return; }
-    if (_selectedId || _selectedIds.size) {
-      _selectedId = null;
-      _selectedIds.clear();
-      _hidePanel();
-      _render();
-    }
+    _hidePanel();  // 선택 해제 + 패널 닫기 + 사이드바 동기화
   });
 
   _svgEl.addEventListener('wheel', (e) => {
@@ -345,7 +344,7 @@ function _computeLayout(nodes) {
     for (const childId of n.children) {
       if (!nodes[childId]) continue;
       const fraction   = leafCount[childId] / leafCount[id];
-      const childSpread = Math.max(fraction * spread, 0.9);
+      const childSpread = Math.max(fraction * spread, 0.6);
       const midAngle   = angle + childSpread / 2;
       const p = _positions[id];
       _positions[childId] = {
@@ -411,7 +410,7 @@ function _makeNode(node, pos) {
   g.style.cursor = 'pointer';
 
   if (isRoot) {
-    // Root — large filled circle
+    // Root — large filled circle (label below removed)
     const circle = _ns('circle');
     _attr(circle, { r: ROOT_R, fill: '#0058be',
       stroke: isSelected ? '#adc6ff' : 'none',
@@ -423,64 +422,51 @@ function _makeNode(node, pos) {
     const inner = _ns('text');
     _attr(inner, { 'text-anchor': 'middle', 'dominant-baseline': 'middle',
       fill: '#ffffff', 'font-family': 'Inter,sans-serif',
-      'font-size': '11', 'font-weight': '700', 'pointer-events': 'none',
+      'font-size': '13', 'font-weight': '700', 'pointer-events': 'none',
     });
-    inner.textContent = _trunc(node.name, 8);
+    inner.textContent = _trunc(node.name, 9);
     g.appendChild(inner);
 
-    const label = _ns('text');
-    _attr(label, { 'text-anchor': 'middle', y: ROOT_R + 20,
-      fill: '#191c1e', 'font-family': 'Inter,sans-serif',
-      'font-size': '13', 'font-weight': '600', 'pointer-events': 'none',
-    });
-    label.textContent = _trunc(node.name, 16);
-    g.appendChild(label);
-
   } else {
-    // Non-root — rounded rect
+    // Non-root — rounded rect, color by type, text only (no icon)
     const W = NODE_W, H = NODE_H;
+
+    // Background + border colors by type
+    const bgNormal   = isQA ? '#fff9f0' : '#f2f5ff';
+    const bgSelected = isQA ? '#fef0d4' : '#dce8ff';
+    const strokeNormal   = isQA ? '#e8c896' : '#c2c6d6';
+    const strokeSelected = isQA ? '#c47d2a' : '#0058be';
+    const textNormal     = isQA ? '#5a3d0a' : '#1a2560';
+    const textSelected   = isQA ? '#c47d2a' : '#0058be';
+    const shadowSelected = isQA
+      ? 'drop-shadow(0 4px 14px rgba(196,125,42,0.22))'
+      : 'drop-shadow(0 4px 14px rgba(0,88,190,0.22))';
 
     const rect = _ns('rect');
     _attr(rect, {
       x: -W / 2, y: -H / 2, width: W, height: H, rx: 10,
-      fill: '#ffffff',
-      stroke: isSelected ? '#0058be' : '#c2c6d6',
-      'stroke-width': isSelected ? 2 : 1,
+      fill: isSelected ? bgSelected : bgNormal,
+      stroke: isSelected ? strokeSelected : strokeNormal,
+      'stroke-width': isSelected ? 2 : 1.5,
       filter: isSelected
-        ? 'drop-shadow(0 4px 14px rgba(0,88,190,0.2))'
+        ? shadowSelected
         : 'drop-shadow(0 2px 6px rgba(0,0,0,0.06))',
     });
     g.appendChild(rect);
 
-    // Icon pill
-    const iconBg = _ns('rect');
-    _attr(iconBg, {
-      x: -W / 2 + 8, y: -H / 2 + 9, width: 30, height: 30, rx: 6,
-      fill: isQA ? '#d0e1fb' : '#eceef0', 'pointer-events': 'none',
-    });
-    g.appendChild(iconBg);
-
-    const icon = _ns('text');
-    _attr(icon, {
-      x: -W / 2 + 23, y: -H / 2 + 24,
-      'text-anchor': 'middle', 'dominant-baseline': 'middle',
-      'font-size': '14', 'pointer-events': 'none',
-    });
-    icon.textContent = isQA ? '?' : '▸';
-    g.appendChild(icon);
-
-    // Node name
+    // Node name — centered, text only
     const nameT = _ns('text');
     _attr(nameT, {
-      x: -W / 2 + 46, y: 1,
+      x: 0, y: 1,
+      'text-anchor': 'middle',
       'dominant-baseline': 'middle',
-      fill: isSelected ? '#0058be' : '#191c1e',
+      fill: isSelected ? textSelected : textNormal,
       'font-family': 'Inter,sans-serif',
-      'font-size': '13',
-      'font-weight': isSelected ? '600' : '500',
+      'font-size': '14',
+      'font-weight': '600',
       'pointer-events': 'none',
     });
-    nameT.textContent = _trunc(node.name, 13);
+    nameT.textContent = _trunc(node.name, 17);
     g.appendChild(nameT);
   }
 
@@ -594,56 +580,63 @@ function _showPanel(nodeId) {
   const sx  = _tx + pos.x * _scale;
   const sy  = _ty + pos.y * _scale;
 
-  const isRoot   = node.parentId === null;
-  const typeLabel = node.type === 'category' ? '카테고리' : 'Q&A';
+  const isRoot    = node.parentId === null;
+  const isQANode  = node.type === 'qa';
+  const accentClr = isQANode ? '#c47d2a' : '#0058be';
+  const typeLabel = isQANode ? 'Q&A' : 'Category';
 
-  // Memory strength (Q&A only)
+  // Memory strength bar (Q&A only)
   let memHTML = '';
-  if (node.type === 'qa') {
+  if (isQANode) {
     const attempts = attemptService.getByNode(nodeId);
     const pct = attempts.length
       ? Math.round(attempts.reduce((s, a) => s + a.result, 0) / attempts.length * 100)
       : 0;
+    const barColor = pct >= 70 ? '#22a05e' : pct >= 40 ? '#e67e00' : '#d94f4f';
     memHTML = `
       <div class="canvas-panel__memory">
-        <span class="canvas-panel__memory-label">메모리 강도</span>
+        <span class="canvas-panel__memory-label">Memory</span>
         <div class="canvas-panel__memory-track">
-          <div class="canvas-panel__memory-fill" style="width:${pct}%"></div>
+          <div class="canvas-panel__memory-fill" style="width:${pct}%;background:${barColor}"></div>
         </div>
-        <span class="canvas-panel__memory-pct">${pct}%</span>
+        <span class="canvas-panel__memory-pct" style="color:${barColor}">${pct}%</span>
       </div>
     `;
   }
 
+  _panelEl.className = `canvas-panel canvas-panel--${node.type}`;
   _panelEl.innerHTML = `
-    <button class="canvas-panel__close" aria-label="닫기">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-           stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-    <div class="canvas-panel__header">
-      <div class="canvas-panel__name">${_esc(node.name)}</div>
-      <span class="canvas-panel__type-badge canvas-panel__type-badge--${node.type}">${typeLabel}</span>
+    <div class="canvas-panel__topbar">
+      <div class="canvas-panel__typetag">
+        <span class="canvas-panel__typedot" style="background:${accentClr}"></span>
+        <span class="canvas-panel__typelabel">${typeLabel}</span>
+      </div>
+      <button class="canvas-panel__close" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
     </div>
+    <div class="canvas-panel__name">${_esc(node.name)}</div>
     ${memHTML}
     <div class="canvas-panel__actions">
-      ${!isRoot ? `<button class="btn btn--primary  canvas-panel__action-btn" data-action="edit">편집</button>` : ''}
+      ${!isRoot ? `<button class="btn btn--primary canvas-panel__action-btn" data-action="edit">Edit</button>` : ''}
       <button class="btn btn--ghost canvas-panel__action-btn" data-action="view">
-        ${node.type === 'category' ? '모아보기' : '카드 보기'}
+        ${isQANode ? 'View Card' : 'View All'}
       </button>
-      ${!isRoot ? `<button class="btn btn--danger canvas-panel__action-btn" data-action="delete">삭제</button>` : ''}
+      ${!isRoot ? `<button class="btn btn--danger canvas-panel__action-btn" data-action="delete">Delete</button>` : ''}
     </div>
   `;
 
-  // Position panel (prefer right of node, flip if it overflows)
-  const PW  = 240;
-  const PH  = node.type === 'qa' ? 210 : 165;
+  // Position panel (prefer right of node, flip if overflows)
+  const PW  = 252;
+  const PH  = isQANode ? 200 : 158;
   const cW  = _container.clientWidth;
   const cH  = _container.clientHeight;
-  let left  = sx + 44;
+  let left  = sx + 48;
   let top   = sy - PH / 2;
-  if (left + PW > cW - 12) left = sx - PW - 44;
+  if (left + PW > cW - 12) left = sx - PW - 48;
   if (top  < 12) top = 12;
   if (top + PH > cH - 12) top = cH - PH - 12;
   if (left < 12) left = 12;
@@ -670,10 +663,12 @@ function _showPanel(nodeId) {
 function _hidePanel() {
   if (_panelEl) _panelEl.hidden = true;
   _hideCanvasCtxPanel();
-  if (_selectedId || _selectedIds.size) {
-    _selectedId = null;
-    _selectedIds.clear();
+  const hadSelection = !!(_selectedId || _selectedIds.size);
+  _selectedId = null;
+  _selectedIds.clear();
+  if (hadSelection) {
     _render();
+    document.dispatchEvent(new CustomEvent('canvas:multiselect', { detail: { ids: [] } }));
   }
 }
 
