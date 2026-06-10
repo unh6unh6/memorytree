@@ -156,3 +156,49 @@ The shape language is modern and approachable.
 - **Cards:** White background with a 1px Slate-200 border. No shadow in rest state; subtle shadow on hover to indicate interactivity.
 - **Tree Nodes:** Specialized components for this system. They should feature a left-aligned blue accent bar when selected, reinforcing the "Tree" metaphor.
 - **Progress Bars:** Thin, 4px height bars using Primary Blue to show memorization strength or deck completion.
+
+## Canvas Node Color Coding
+
+Canvas nodes are color-coded based on the most recent test attempt result. This provides instant visual feedback on learning progress without requiring the user to open any panel.
+
+| State | Color | Hex |
+|-------|-------|-----|
+| Success | Green | `#22c55e` |
+| Fail | Red | `#ef4444` |
+| Partial | Orange | `#f97316` |
+| Not attempted | Gray | Default surface color |
+
+- **QA nodes** reflect their own latest attempt result directly.
+- **Category nodes** display a representative color derived from the aggregated results of their descendant QA nodes (e.g., majority-rule or worst-case coloring).
+- Color fills should be applied as a semi-transparent tint on the node body, keeping the label readable. Use `opacity: 0.85` on the fill and ensure the node label text uses a contrasting dark color.
+
+## Color Contrast & Accessibility
+
+All UI elements must pass a minimum contrast ratio of 4.5:1 (WCAG AA) for normal text.
+
+Known rules:
+- **"Hide Answer" / "정답 가리기" button**: Must use a clearly distinct background and text color. Do not use the same primary blue for both the button fill and label. Recommended: white label on solid blue, or outlined button with blue label on white.
+- **Floating panel buttons (e.g., View Card)**: Panel buttons rendered on white or light backgrounds must use a visible border (`#E2E8F0` or darker) — never white-on-white.
+- Before shipping any UI change, visually verify that no text, icon, or border disappears into the background.
+
+## Design Language Consistency — All Screens
+
+The main canvas explorer screen sets the visual baseline. All other screens must align with it.
+
+### Shared Visual Tokens (apply to all three screens)
+- **Background:** `#f7f9fb` (surface) with the subtle radial-grid texture used in the canvas (optional on non-canvas screens but the tone must match).
+- **Surface Cards:** Light glassmorphism-lite style — `background: rgba(255,255,255,0.85)`, `backdrop-filter: blur(8px)`, `border: 1px solid rgba(226,232,240,0.8)`, `border-radius: 12px`.
+- **Typography:** Inter throughout; headlines use `font-weight: 600`, body uses `font-weight: 400`, labels use `font-weight: 500`.
+- **Button Style:** Consistent primary (solid blue), secondary (outlined gray), and destructive (red outlined) variants across all screens.
+
+### Q&A List Screen
+The list screen should feel like a "reading surface" that extends from the same design space as the canvas.
+- Use the same background color and card elevation as the canvas floating panels.
+- Category path breadcrumb and sort/filter controls should use the same chip and dropdown styles as the canvas toolbar.
+- Q&A cards use the shared card style above; the result emoji and last-attempt date are displayed as muted labels below the answer.
+
+### Test (Flashcard) Screen
+The test screen should feel immersive yet consistent with the rest of the app.
+- The flashcard container uses the shared card style with a slightly larger `border-radius: 16px` and a gentle drop shadow to give it a "lifted" feel.
+- Progress bar at the bottom uses Primary Blue (`#3B82F6`), height 4px, matching the canvas progress indicators.
+- Self-evaluation buttons (Fail / Partial / Success) use semantic colors (red / orange / green) with white labels, matching the canvas node color palette.
