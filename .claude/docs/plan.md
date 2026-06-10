@@ -9,12 +9,12 @@
 
 ## Phase 2. 데이터 레이어
 
-- [ ] 핵심 데이터 모델 정의
+- [x] 핵심 데이터 모델 정의
   - `TreeNode { id, parentId, name, type: 'category' | 'qa', children[] }`
   - `QANode { id, question, answer, importance(0-5), createdAt }`
   - `Attempt { id, nodeId, result: 1.0 | 0.5 | 0.0, timestamp }`
-- [ ] LocalStorage CRUD 서비스 (`nodeService`, `attemptService`)
-- [ ] 초기 샘플 데이터 (CS > Data Structures, Algorithms 예시 포함)
+- [x] LocalStorage CRUD 서비스 (`nodeService`, `attemptService`)
+- [x] 초기 샘플 데이터 (CS > Data Structures, Algorithms 예시 포함)
 
 ## Phase 3. 레이아웃 & 공통 컴포넌트
 
