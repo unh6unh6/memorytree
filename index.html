@@ -11,34 +11,34 @@
 
     <!-- 상단 내비게이션 바 -->
     <nav class="navbar" id="navbar">
-      <div class="navbar__brand">
+      <a class="navbar__brand" href="#explorer">
         <svg class="navbar__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/>
           <path d="M2 17l10 5 10-5"/>
           <path d="M2 12l10 5 10-5"/>
         </svg>
         <span class="navbar__title">Memory Tree</span>
-      </div>
-      <div class="navbar__search-wrapper">
-        <svg class="navbar__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input
-          type="search"
-          class="navbar__search"
-          id="navbar-search"
-          placeholder="노드 검색..."
-          autocomplete="off"
-          aria-label="노드 검색"
-        />
-      </div>
+      </a>
     </nav>
 
     <!-- Explorer 화면 -->
     <div class="view" data-view="explorer">
       <aside class="sidebar" id="sidebar">
         <div class="sidebar__header">탐색기</div>
+        <div class="sidebar__search-bar">
+          <svg class="sidebar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="search"
+            id="sidebar-search"
+            class="sidebar__search-input"
+            placeholder="노드 검색..."
+            autocomplete="off"
+            aria-label="노드 검색"
+          />
+        </div>
         <div class="sidebar__body" id="sidebar-body"></div>
       </aside>
       <div class="sidebar-resizer" id="sidebar-resizer" title="드래그하여 너비 조절"></div>

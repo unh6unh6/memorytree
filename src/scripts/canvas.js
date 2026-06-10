@@ -14,23 +14,31 @@ let _container  = null;
 let _svgEl      = null;
 let _gEl        = null;
 let _panelEl    = null;
-let _selectedId = null;
-let _tx         = 0;
-let _ty         = 0;
-let _scale      = 1;
-let _positions  = {};   // nodeId → { x, y }
+let _selectedId  = null;
+let _selectedIds = new Set();   // 다중선택 상태
+let _tx          = 0;
+let _ty          = 0;
+let _scale       = 1;
+let _positions   = {};   // nodeId → { x, y }
 
-let _isPanning        = false;
-let _panStart         = null;
 let _didPan           = false;
 let _initialized      = false;
 
 // 노드 드래그 상태
-let _draggingNodeId   = null;
-let _dragStart        = null;
-let _dragNodeStartPos = null;
-let _isDraggingNode   = false;
-let _manualPositions  = {};   // 수동 이동된 노드 위치 오버라이드
+let _draggingNodeId    = null;
+let _dragStart         = null;
+let _dragNodeStartPos  = null;
+let _isDraggingNode    = false;
+let _dragGroupStartPos = null;   // 그룹 드래그 시 선택 노드들의 시작 위치
+let _manualPositions   = {};     // 수동 이동된 노드 위치 오버라이드
+
+// 러버밴드 선택 상태
+let _isRubberBanding = false;
+let _rubberStart     = null;
+let _rubberEl        = null;
+
+// 애니메이션 상태
+let _animating = false;
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -42,9 +50,17 @@ export function init(container) {
 
   if (!_initialized) {
     _initialized = true;
-    // 사이드바 선택 → 캔버스 노드 선택 (패널 미표시)
+    // 사이드바 단일 선택 → 캔버스 동기화
     document.addEventListener('sidebar:select', (e) => {
       _selectedId = e.detail.id;
+      _selectedIds.clear();
+      _selectedIds.add(e.detail.id);
+      _render();
+    });
+    // 사이드바 다중선택 → 캔버스 다중선택 동기화
+    document.addEventListener('sidebar:multiselect', (e) => {
+      _selectedIds = new Set(e.detail.ids);
+      _selectedId  = e.detail.ids[e.detail.ids.length - 1] || null;
       _render();
     });
     // 사이드바 리사이즈 → _tx 보정으로 노드 화면 위치 고정
@@ -65,26 +81,25 @@ export function refresh() {
 function _setupDOM() {
   _container.innerHTML = `
     <svg id="canvas-svg" xmlns="http://www.w3.org/2000/svg"
-         style="width:100%;height:100%;position:absolute;inset:0;cursor:grab;display:block">
+         style="width:100%;height:100%;position:absolute;inset:0;display:block">
       <g id="canvas-g"></g>
+      <rect id="canvas-rubber" display="none" pointer-events="none"
+            fill="rgba(0,88,190,0.08)" stroke="#0058be" stroke-width="1"
+            stroke-dasharray="4 2" rx="2"/>
     </svg>
     <div id="canvas-panel" class="canvas-panel" hidden></div>
     <div class="canvas-controls">
-      <button class="canvas-ctrl-btn" id="ctrl-zoom-in" title="확대">
+      <button class="canvas-ctrl-btn" id="ctrl-rearrange" title="노드 재배치">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
              stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          <line x1="11" y1="8" x2="11" y2="14"/>
-          <line x1="8" y1="11" x2="14" y2="11"/>
-        </svg>
-      </button>
-      <button class="canvas-ctrl-btn" id="ctrl-zoom-out" title="축소">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          <line x1="8" y1="11" x2="14" y2="11"/>
+          <circle cx="12" cy="4" r="1.5"/>
+          <circle cx="5"  cy="19" r="1.5"/>
+          <circle cx="12" cy="19" r="1.5"/>
+          <circle cx="19" cy="19" r="1.5"/>
+          <line x1="12" y1="5.5" x2="12"  y2="12"/>
+          <line x1="12" y1="12"  x2="5.5" y2="17.5"/>
+          <line x1="12" y1="12"  x2="12"  y2="17.5"/>
+          <line x1="12" y1="12"  x2="18.5" y2="17.5"/>
         </svg>
       </button>
       <button class="canvas-ctrl-btn canvas-ctrl-btn--primary" id="ctrl-center" title="중앙으로">
@@ -97,20 +112,20 @@ function _setupDOM() {
     </div>
   `;
 
-  _svgEl   = document.getElementById('canvas-svg');
-  _gEl     = document.getElementById('canvas-g');
-  _panelEl = document.getElementById('canvas-panel');
+  _svgEl    = document.getElementById('canvas-svg');
+  _gEl      = document.getElementById('canvas-g');
+  _panelEl  = document.getElementById('canvas-panel');
+  _rubberEl = document.getElementById('canvas-rubber');
 
-  _centerView();
+  _centerViewInstant();
 
-  document.getElementById('ctrl-zoom-in') .addEventListener('click', (e) => { e.stopPropagation(); _zoom(1.25); });
-  document.getElementById('ctrl-zoom-out').addEventListener('click', (e) => { e.stopPropagation(); _zoom(0.8); });
-  document.getElementById('ctrl-center')  .addEventListener('click', (e) => { e.stopPropagation(); _centerView(); });
+  document.getElementById('ctrl-center')   .addEventListener('click', (e) => { e.stopPropagation(); _centerView(); });
+  document.getElementById('ctrl-rearrange').addEventListener('click', (e) => { e.stopPropagation(); _rearrange(); });
 }
 
 // ─── Transform ────────────────────────────────────────────────────────────────
 
-function _centerView() {
+function _centerViewInstant() {
   if (!_container) return;
   _tx    = _container.clientWidth  / 2;
   _ty    = _container.clientHeight / 2;
@@ -118,15 +133,28 @@ function _centerView() {
   _applyTransform();
 }
 
-function _zoom(factor) {
+function _centerView() {
   if (!_container) return;
-  const newScale = Math.max(0.2, Math.min(3, _scale * factor));
-  const cx = _container.clientWidth  / 2;
-  const cy = _container.clientHeight / 2;
-  _tx    = cx - (cx - _tx) * (newScale / _scale);
-  _ty    = cy - (cy - _ty) * (newScale / _scale);
-  _scale = newScale;
-  _applyTransform();
+  _animateTo(_container.clientWidth / 2, _container.clientHeight / 2, 1);
+}
+
+function _animateTo(targetTx, targetTy, targetScale) {
+  const fromTx    = _tx;
+  const fromTy    = _ty;
+  const fromScale = _scale;
+  const duration  = 400;
+  const startTime = performance.now();
+
+  function frame(now) {
+    const t    = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    _tx    = fromTx    + (targetTx    - fromTx)    * ease;
+    _ty    = fromTy    + (targetTy    - fromTy)    * ease;
+    _scale = fromScale + (targetScale - fromScale) * ease;
+    _applyTransform();
+    if (t < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
 function _applyTransform() {
@@ -137,13 +165,15 @@ function _applyTransform() {
 // ─── Pan / Zoom events ────────────────────────────────────────────────────────
 
 function _bindPanZoom() {
+  // 빈 캔버스 영역 mousedown → 러버밴드 시작
   _svgEl.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
     if (e.target.closest('[data-role="node"]')) return;
     if (e.target.closest('.canvas-controls')) return;
-    _isPanning = true;
-    _didPan    = false;
-    _panStart  = { x: e.clientX, y: e.clientY, tx: _tx, ty: _ty };
-    _svgEl.style.cursor = 'grabbing';
+    const rect = _svgEl.getBoundingClientRect();
+    _isRubberBanding = true;
+    _didPan = false;
+    _rubberStart = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     e.preventDefault();
   });
 
@@ -154,31 +184,78 @@ function _bindPanZoom() {
       const dy = (e.clientY - _dragStart.y) / _scale;
       if (Math.abs(dx) > 3 || Math.abs(dy) > 3) _isDraggingNode = true;
       if (_isDraggingNode) {
-        _manualPositions[_draggingNodeId] = {
-          x: _dragNodeStartPos.x + dx,
-          y: _dragNodeStartPos.y + dy,
-        };
-        _positions[_draggingNodeId] = _manualPositions[_draggingNodeId];
+        if (_selectedIds.has(_draggingNodeId) && _selectedIds.size > 1 && _dragGroupStartPos) {
+          // 그룹 드래그: 다중선택된 모든 노드를 동일한 delta로 이동
+          for (const id of _selectedIds) {
+            if (!_dragGroupStartPos[id]) continue;
+            _manualPositions[id] = {
+              x: _dragGroupStartPos[id].x + dx,
+              y: _dragGroupStartPos[id].y + dy,
+            };
+            _positions[id] = _manualPositions[id];
+          }
+        } else {
+          _manualPositions[_draggingNodeId] = {
+            x: _dragNodeStartPos.x + dx,
+            y: _dragNodeStartPos.y + dy,
+          };
+          _positions[_draggingNodeId] = _manualPositions[_draggingNodeId];
+        }
         _render();
       }
       return;
     }
-    // 캔버스 팬
-    if (!_isPanning || !_panStart) return;
-    const dx = e.clientX - _panStart.x;
-    const dy = e.clientY - _panStart.y;
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) _didPan = true;
-    _tx = _panStart.tx + dx;
-    _ty = _panStart.ty + dy;
-    _applyTransform();
+    // 러버밴드 드래그
+    if (!_isRubberBanding || !_rubberStart || !_rubberEl) return;
+    const rect = _svgEl.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    const rw = Math.abs(cx - _rubberStart.x);
+    const rh = Math.abs(cy - _rubberStart.y);
+    if (rw > 4 || rh > 4) {
+      _didPan = true;
+      _rubberEl.setAttribute('x', Math.min(_rubberStart.x, cx));
+      _rubberEl.setAttribute('y', Math.min(_rubberStart.y, cy));
+      _rubberEl.setAttribute('width',  rw);
+      _rubberEl.setAttribute('height', rh);
+      _rubberEl.setAttribute('display', '');
+    }
   });
 
-  window.addEventListener('mouseup', () => {
-    _draggingNodeId = null;
-    _dragStart      = null;
-    _isPanning      = false;
-    _panStart       = null;
-    if (_svgEl) _svgEl.style.cursor = 'grab';
+  window.addEventListener('mouseup', (e) => {
+    // 노드 드래그 종료
+    _draggingNodeId    = null;
+    _dragStart         = null;
+    _dragGroupStartPos = null;
+
+    // 러버밴드 종료 → 영역 내 노드 다중선택
+    if (_isRubberBanding) {
+      _isRubberBanding = false;
+      if (_rubberEl && _rubberEl.getAttribute('display') !== 'none') {
+        const rx = parseFloat(_rubberEl.getAttribute('x'))      || 0;
+        const ry = parseFloat(_rubberEl.getAttribute('y'))      || 0;
+        const rw = parseFloat(_rubberEl.getAttribute('width'))  || 0;
+        const rh = parseFloat(_rubberEl.getAttribute('height')) || 0;
+        if (rw > 4 && rh > 4) {
+          _selectedIds.clear();
+          Object.entries(_positions).forEach(([id, pos]) => {
+            const sx = _tx + pos.x * _scale;
+            const sy = _ty + pos.y * _scale;
+            if (sx >= rx && sx <= rx + rw && sy >= ry && sy <= ry + rh) {
+              _selectedIds.add(id);
+            }
+          });
+          _selectedId = [..._selectedIds][_selectedIds.size - 1] || null;
+          _render();
+          if (_selectedIds.size > 0) {
+            document.dispatchEvent(new CustomEvent('canvas:multiselect', {
+              detail: { ids: [..._selectedIds] },
+            }));
+          }
+        }
+        _rubberEl.setAttribute('display', 'none');
+      }
+    }
   });
 
   // 캔버스 배경 우클릭 시 브라우저 기본 메뉴 방지
@@ -188,8 +265,9 @@ function _bindPanZoom() {
 
   _svgEl.addEventListener('click', () => {
     if (_didPan) { _didPan = false; return; }
-    if (_selectedId) {
+    if (_selectedId || _selectedIds.size) {
       _selectedId = null;
+      _selectedIds.clear();
       _hidePanel();
       _render();
     }
@@ -293,7 +371,7 @@ function _makeEdge(from, to) {
 
 function _makeNode(node, pos) {
   const isRoot     = node.parentId === null;
-  const isSelected = node.id === _selectedId;
+  const isSelected = _selectedIds.has(node.id);
   const isQA       = node.type === 'qa';
 
   const g = _ns('g');
@@ -412,28 +490,63 @@ function _makeNode(node, pos) {
     _dragStart        = { x: e.clientX, y: e.clientY };
     _dragNodeStartPos = { ..._positions[node.id] };
     _isDraggingNode   = false;
+    // 다중선택 그룹 드래그: 선택된 모든 노드의 시작 위치 캡처
+    if (_selectedIds.has(node.id) && _selectedIds.size > 1) {
+      _dragGroupStartPos = {};
+      for (const id of _selectedIds) {
+        if (_positions[id]) _dragGroupStartPos[id] = { ..._positions[id] };
+      }
+    } else {
+      _dragGroupStartPos = null;
+    }
   });
 
-  // 좌클릭: 선택만 (드래그가 아닌 경우)
+  // 좌클릭: 선택 (Shift → 다중선택, 그 외 단일선택)
   g.addEventListener('click', (e) => {
     e.stopPropagation();
     if (_isDraggingNode) { _isDraggingNode = false; return; }
     const addEl = e.target.closest('[data-role="add"]');
     if (addEl) { _openAddModal(addEl.dataset.parent); return; }
-    _selectedId = node.id;
-    _render();
-    // 캔버스→사이드바 동기화 이벤트
-    document.dispatchEvent(new CustomEvent('canvas:select', { detail: { id: node.id } }));
+
+    if (e.shiftKey) {
+      // Shift 다중선택
+      if (_selectedIds.has(node.id)) {
+        _selectedIds.delete(node.id);
+        if (_selectedId === node.id) _selectedId = [..._selectedIds][_selectedIds.size - 1] || null;
+      } else {
+        _selectedIds.add(node.id);
+        _selectedId = node.id;
+      }
+      _render();
+      document.dispatchEvent(new CustomEvent('canvas:multiselect', {
+        detail: { ids: [..._selectedIds] },
+      }));
+    } else {
+      _selectedId = node.id;
+      _selectedIds.clear();
+      _selectedIds.add(node.id);
+      _render();
+      document.dispatchEvent(new CustomEvent('canvas:select', { detail: { id: node.id } }));
+    }
   });
 
-  // 우클릭: 플로팅 상세 패널 표시
+  // 우클릭: 단일 → 상세 패널 / 다중 → 삭제 패널
   g.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    _selectedId = node.id;
-    _render();
-    _showPanel(node.id);
-    document.dispatchEvent(new CustomEvent('canvas:select', { detail: { id: node.id } }));
+
+    if (_selectedIds.size > 1 && _selectedIds.has(node.id)) {
+      // 다중선택 상태: 삭제 패널
+      _render();
+      _showMultiDeletePanel(e.clientX, e.clientY);
+    } else {
+      _selectedId = node.id;
+      _selectedIds.clear();
+      _selectedIds.add(node.id);
+      _render();
+      _showPanel(node.id);
+      document.dispatchEvent(new CustomEvent('canvas:select', { detail: { id: node.id } }));
+    }
   });
 
   return g;
@@ -526,7 +639,80 @@ function _showPanel(nodeId) {
 
 function _hidePanel() {
   if (_panelEl) _panelEl.hidden = true;
-  if (_selectedId) { _selectedId = null; _render(); }
+  _hideCanvasCtxPanel();
+  if (_selectedId || _selectedIds.size) {
+    _selectedId = null;
+    _selectedIds.clear();
+    _render();
+  }
+}
+
+// ─── 캔버스 다중선택 삭제 패널 (Task 6) ──────────────────────────────────────
+
+let _canvasCtxPanel = null;
+
+function _showMultiDeletePanel(clientX, clientY) {
+  _hideCanvasCtxPanel();
+  const count = _selectedIds.size;
+  const panel = document.createElement('div');
+  panel.className = 'sidebar-ctx-panel';
+  panel.style.zIndex = 'var(--z-dropdown)';
+  panel.innerHTML = `
+    <div class="sidebar-ctx-panel__name">${count}개 선택됨</div>
+    <hr class="sidebar-ctx-panel__divider">
+    <button class="sidebar-ctx-panel__item sidebar-ctx-panel__item--danger" data-action="del-multi">${count}개 삭제</button>
+  `;
+  document.body.appendChild(panel);
+  _canvasCtxPanel = panel;
+
+  const PW = 180;
+  const PH = panel.offsetHeight || 80;
+  let left = clientX + 4;
+  let top  = clientY;
+  if (left + PW > window.innerWidth  - 8) left = clientX - PW - 4;
+  if (top  + PH > window.innerHeight - 8) top  = window.innerHeight - PH - 8;
+  panel.style.left = `${Math.max(4, left)}px`;
+  panel.style.top  = `${Math.max(4, top)}px`;
+
+  panel.querySelector('[data-action="del-multi"]')?.addEventListener('click', () => {
+    _hideCanvasCtxPanel();
+    _deleteMultiple([..._selectedIds]);
+  });
+
+  setTimeout(() => {
+    document.addEventListener('mousedown', _onCanvasCtxOutside, { once: true });
+  }, 0);
+}
+
+function _onCanvasCtxOutside(e) {
+  if (_canvasCtxPanel && !_canvasCtxPanel.contains(e.target)) _hideCanvasCtxPanel();
+}
+
+function _hideCanvasCtxPanel() {
+  if (_canvasCtxPanel) { _canvasCtxPanel.remove(); _canvasCtxPanel = null; }
+  document.removeEventListener('mousedown', _onCanvasCtxOutside);
+}
+
+function _deleteMultiple(ids) {
+  modal.open({
+    title: `${ids.length}개 노드 삭제`,
+    bodyHTML: `<p style="color:var(--color-on-surface-variant);font-size:14px">
+      선택한 <strong>${ids.length}개</strong> 노드 및 각 하위 노드를 모두 삭제합니다.<br>이 작업은 되돌릴 수 없습니다.
+    </p>`,
+    confirmLabel: '삭제',
+    onConfirm: () => {
+      let deleted = 0;
+      for (const id of ids) {
+        try { nodeService.remove(id); deleted++; } catch { /* already removed */ }
+      }
+      _selectedIds.clear();
+      _selectedId = null;
+      if (_panelEl) _panelEl.hidden = true;
+      toast.success(`${deleted}개 삭제되었습니다.`);
+      _render();
+      document.dispatchEvent(new CustomEvent('canvas:data-change'));
+    },
+  });
 }
 
 // ─── CRUD ─────────────────────────────────────────────────────────────────────
@@ -703,3 +889,90 @@ function _esc(s) {
 }
 
 function _trunc(s, n) { return s.length > n ? s.slice(0, n) + '…' : s; }
+
+// ─── 노드 재배치 ───────────────────────────────────────────────────────────────
+
+function _rearrange() {
+  if (_animating) return;
+  const nodes = nodeService.getAll();
+  const fromPositions = { ..._positions };
+
+  // 재배치 대상 결정: 다중선택이면 해당 노드+하위, 없으면 전체
+  let idsToRearrange = null;
+  if (_selectedIds.size > 0) {
+    idsToRearrange = new Set();
+    for (const id of _selectedIds) {
+      _collectDescendantsCanvas(nodes, id).forEach(d => idsToRearrange.add(d));
+    }
+  }
+
+  // 대상 노드의 수동 위치를 임시 제거 후 레이아웃 재계산
+  const backupManual = { ..._manualPositions };
+  if (idsToRearrange) {
+    idsToRearrange.forEach(id => delete _manualPositions[id]);
+  } else {
+    _manualPositions = {};
+  }
+
+  _computeLayout(nodes);
+  const toPositions = { ..._positions };
+
+  // 재배치하지 않는 노드의 수동 위치 복원
+  _manualPositions = {};
+  Object.entries(backupManual).forEach(([id, pos]) => {
+    if (!idsToRearrange || !idsToRearrange.has(id)) {
+      _manualPositions[id] = pos;
+    }
+  });
+
+  _animatePositions(fromPositions, toPositions);
+}
+
+function _animatePositions(from, to) {
+  if (_animating) return;
+  _animating = true;
+  const duration  = 600;
+  const startTime = performance.now();
+
+  function frame(now) {
+    const t    = Math.min((now - startTime) / duration, 1);
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+    // 애니메이션 중: 보간된 위치를 manualPositions로 설정하여 _computeLayout 오버라이드 활용
+    const interpolated = {};
+    Object.keys(to).forEach(id => {
+      if (id === ROOT_NODE_ID) return;
+      const f = from[id] || to[id];
+      interpolated[id] = {
+        x: f.x + (to[id].x - f.x) * ease,
+        y: f.y + (to[id].y - f.y) * ease,
+      };
+    });
+    _manualPositions = interpolated;
+    _render();
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      _animating = false;
+      // 최종 위치를 manualPositions로 고정
+      _manualPositions = {};
+      Object.entries(to).forEach(([id, pos]) => {
+        if (id !== ROOT_NODE_ID) _manualPositions[id] = pos;
+      });
+      _render();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function _collectDescendantsCanvas(nodes, id) {
+  const result = new Set();
+  const queue  = [id];
+  while (queue.length) {
+    const cur = queue.shift();
+    result.add(cur);
+    (nodes[cur]?.children ?? []).forEach(c => queue.push(c));
+  }
+  return result;
+}

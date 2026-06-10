@@ -118,6 +118,42 @@ const nodeService = {
     save(KEYS.nodes, nodes);
   },
 
+  /**
+   * 노드를 다른 부모 하위로 이동한다.
+   * 이동 불가 조건: root 이동, 자기 자신, QA 하위, 타입 혼합, 순환 구조
+   */
+  moveNode(nodeId, newParentId) {
+    if (nodeId === ROOT_NODE_ID) throw new Error('root 노드는 이동할 수 없습니다.');
+    if (nodeId === newParentId) throw new Error('자기 자신으로 이동할 수 없습니다.');
+    const nodes = this.getAll();
+    const node = nodes[nodeId];
+    const newParent = nodes[newParentId];
+    if (!node)      throw new Error('이동할 노드를 찾을 수 없습니다.');
+    if (!newParent) throw new Error('대상 부모 노드를 찾을 수 없습니다.');
+    if (newParent.type === 'qa') throw new Error('QA 노드 하위로는 이동할 수 없습니다.');
+    if (node.parentId === newParentId) throw new Error('이미 해당 노드의 하위입니다.');
+    // 순환 구조 방지
+    const descendants = this._collectDescendants(nodes, nodeId);
+    if (descendants.has(newParentId)) throw new Error('자신의 하위 노드로 이동할 수 없습니다.');
+    // 타입 일관성 검사
+    if (newParent.children.length > 0) {
+      const existingType = nodes[newParent.children[0]]?.type;
+      if (existingType && existingType !== node.type) {
+        const label = existingType === 'category' ? '카테고리' : 'Q&A';
+        throw new Error(`이동 불가: 대상 노드에 이미 '${label}' 타입의 자식이 있습니다.`);
+      }
+    }
+    // 기존 부모에서 제거
+    if (node.parentId) {
+      const oldParent = nodes[node.parentId];
+      if (oldParent) oldParent.children = oldParent.children.filter(c => c !== nodeId);
+    }
+    // 새 부모에 추가
+    node.parentId = newParentId;
+    newParent.children.push(nodeId);
+    save(KEYS.nodes, nodes);
+  },
+
   /** 부모 아래 첫 번째 자식이 이미 있을 때 새 자식 타입 충돌 여부 체크 */
   _assertChildTypeConsistency(nodes, parentId, newType) {
     const parent = nodes[parentId];
