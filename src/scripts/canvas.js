@@ -24,6 +24,10 @@ let _positions   = {};   // nodeId → { x, y }
 let _didPan           = false;
 let _initialized      = false;
 
+// 휠 버튼 패닝 상태
+let _isPanning = false;
+let _panStart  = null;
+
 // 노드 드래그 상태
 let _draggingNodeId    = null;
 let _dragStart         = null;
@@ -165,8 +169,16 @@ function _applyTransform() {
 // ─── Pan / Zoom events ────────────────────────────────────────────────────────
 
 function _bindPanZoom() {
-  // 빈 캔버스 영역 mousedown → 러버밴드 시작
+  // 휠 버튼(button=1) → 패닝 시작 / 좌클릭 빈 영역 → 러버밴드 시작
   _svgEl.addEventListener('mousedown', (e) => {
+    if (e.button === 1) {
+      // 휠 버튼 패닝
+      e.preventDefault();
+      _isPanning = true;
+      _panStart  = { x: e.clientX, y: e.clientY, tx: _tx, ty: _ty };
+      _svgEl.style.cursor = 'grabbing';
+      return;
+    }
     if (e.button !== 0) return;
     if (e.target.closest('[data-role="node"]')) return;
     if (e.target.closest('.canvas-controls')) return;
@@ -177,7 +189,17 @@ function _bindPanZoom() {
     e.preventDefault();
   });
 
+  // 휠 버튼 스크롤 커서 방지
+  _svgEl.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
+
   window.addEventListener('mousemove', (e) => {
+    // 휠 버튼 패닝
+    if (_isPanning && _panStart) {
+      _tx = _panStart.tx + (e.clientX - _panStart.x);
+      _ty = _panStart.ty + (e.clientY - _panStart.y);
+      _applyTransform();
+      return;
+    }
     // 노드 드래그 우선
     if (_draggingNodeId && _dragStart) {
       const dx = (e.clientX - _dragStart.x) / _scale;
@@ -223,6 +245,14 @@ function _bindPanZoom() {
   });
 
   window.addEventListener('mouseup', (e) => {
+    // 휠 버튼 패닝 종료
+    if (e.button === 1 && _isPanning) {
+      _isPanning = false;
+      _panStart  = null;
+      if (_svgEl) _svgEl.style.cursor = '';
+      return;
+    }
+
     // 노드 드래그 종료
     _draggingNodeId    = null;
     _dragStart         = null;

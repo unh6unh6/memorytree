@@ -98,6 +98,177 @@
   color: var(--color-on-surface-variant);
 }
 
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.navbar__action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.navbar__action-btn svg {
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.navbar__action-btn:hover {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+}
+
+.navbar__action-btn--labeled {
+  width: auto;
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-family);
+}
+
+.navbar__action-btn--labeled span {
+  pointer-events: none;
+}
+
+/* ── IO Dropdown Menu ── */
+.io-menu {
+  position: fixed;
+  z-index: 500;
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.08);
+  min-width: 260px;
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+}
+
+.io-menu__divider {
+  border: none;
+  border-top: var(--border);
+  margin: var(--space-1) 0;
+}
+
+.io-menu__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background var(--transition-fast);
+}
+
+.io-menu__item:hover {
+  background: var(--color-surface-container);
+}
+
+.io-menu__item-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-on-surface-variant);
+}
+
+.io-menu__item-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.io-menu__item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.io-menu__item-title {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface);
+}
+
+.io-menu__item-desc {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+}
+
+.io-menu__item-warn {
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-error, #b3261e);
+  margin-top: 1px;
+}
+
+/* ── IO Other Guide Modal ── */
+.io-guide__steps {
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.io-guide__steps li {
+  font-size: 13px;
+  color: var(--color-on-surface);
+  line-height: 1.6;
+}
+
+.io-guide__prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.io-guide__copy-btn {
+  padding: 2px 10px;
+  font-size: 12px;
+  height: 26px;
+}
+
+.io-guide__prompt {
+  background: var(--color-surface-container-low);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-family: "Menlo", "Consolas", monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 260px;
+  overflow-y: auto;
+  color: var(--color-on-surface);
+  margin: 0;
+  user-select: all;
+}
+
 /* ── Sidebar ── */
 .sidebar {
   width: var(--sidebar-width);

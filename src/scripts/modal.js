@@ -33,18 +33,18 @@ function init() {
  *   onClose?: () => void,
  * }} opts
  */
-function open({ title, bodyHTML, confirmLabel = '확인', cancelLabel = '취소', onConfirm, onClose } = {}) {
+function open({ title, bodyHTML, confirmLabel = '확인', cancelLabel = '취소', showCancel = true, onConfirm, onClose } = {}) {
   _titleEl.textContent = title;
   _bodyEl.innerHTML = bodyHTML;
   _onConfirm = onConfirm || null;
   _onClose   = onClose   || null;
 
-  _footerEl.innerHTML = `
-    <button class="btn btn--ghost"   id="modal-cancel">${_escapeHtml(cancelLabel)}</button>
-    <button class="btn btn--primary" id="modal-confirm">${_escapeHtml(confirmLabel)}</button>
-  `;
+  _footerEl.innerHTML = [
+    showCancel ? `<button class="btn btn--ghost" id="modal-cancel">${_escapeHtml(cancelLabel)}</button>` : '',
+    `<button class="btn btn--primary" id="modal-confirm">${_escapeHtml(confirmLabel)}</button>`,
+  ].join('');
 
-  _footerEl.querySelector('#modal-cancel').addEventListener('click', close);
+  if (showCancel) _footerEl.querySelector('#modal-cancel').addEventListener('click', close);
   _footerEl.querySelector('#modal-confirm').addEventListener('click', _handleConfirm);
 
   _backdrop.hidden = false;

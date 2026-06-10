@@ -8,6 +8,7 @@ import * as toast from './toast.js';
 import * as canvas from './canvas.js';
 import * as list from './list.js';
 import * as test from './test.js';
+import * as io from './io.js';
 
 // root 노드 보장 → 샘플 데이터 삽입 (최초 1회)
 initRootNode();
@@ -17,6 +18,7 @@ seedIfEmpty();
 navbar.init();
 modal.init();
 toast.init();
+io.init();
 
 // canvas에서 데이터가 바뀌면 사이드바 동기화
 document.addEventListener('canvas:data-change', () => sidebar.refresh());
