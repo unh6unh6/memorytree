@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Test Mode | Memory Tree</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-high": "#e6e8ea", "on-error-container": "#93000a", "primary-fixed": "#d8e2ff", "on-secondary-container": "#54647a", "on-primary-fixed-variant": "#004395", "surface-bright": "#f7f9fb", "surface-dim": "#d8dadc", "on-secondary": "#ffffff", "surface-container-low": "#f2f4f6", secondary: "#505f76", "primary-fixed-dim": "#adc6ff", "secondary-container": "#d0e1fb", outline: "#727785", "on-background": "#191c1e", surface: "#f7f9fb", "error-container": "#ffdad6", error: "#ba1a1a", "on-error": "#ffffff", "secondary-fixed": "#d3e4fe", "outline-variant": "#c2c6d6", "surface-tint": "#005ac2", "on-primary-container": "#fefcff", "tertiary-fixed": "#ffdcc6", "secondary-fixed-dim": "#b7c8e1", background: "#f7f9fb", "tertiary-container": "#b75b00", "on-secondary-fixed-variant": "#38485d", "inverse-surface": "#2d3133", "on-tertiary-fixed-variant": "#723600", "on-tertiary-container": "#fffbff", "on-primary": "#ffffff", "inverse-on-surface": "#eff1f3", "on-primary-fixed": "#001a42", "surface-container-lowest": "#ffffff", "surface-container": "#eceef0", "primary-container": "#2170e4", primary: "#0058be", "on-surface": "#191c1e", "inverse-primary": "#adc6ff", "surface-container-highest": "#e0e3e5", "surface-variant": "#e0e3e5", "on-secondary-fixed": "#0b1c30", "on-surface-variant": "#424754", "tertiary-fixed-dim": "#ffb786", tertiary: "#924700", "on-tertiary-fixed": "#311400", "on-tertiary": "#ffffff"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "64px", "container-max": "1280px", "margin-mobile": "16px", "space-xl": "40px", "space-xs": "4px", unit: "4px", "space-md": "16px", "space-sm": "8px", gutter: "24px", "space-lg": "24px"}, fontFamily: {"title-lg": ["Inter"], "headline-md": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-lg-mobile": ["Inter"], "body-md": ["Inter"], "headline-lg": ["Inter"], "display-lg": ["Inter"], headline: ["Inter"], display: ["Inter"], body: ["Inter"], label: ["Inter"]}, fontSize: {"title-lg": ["20px", {lineHeight: "1.4", fontWeight: "500"}], "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "600"}], "body-lg": ["16px", {lineHeight: "1.6", fontWeight: "400"}], "label-md": ["12px", {lineHeight: "1", letterSpacing: "0.01em", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "1.2", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "1.5", fontWeight: "400"}], "headline-lg": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600"}], "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700"}]}}}};</script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .answer-reveal {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .answer-reveal.active {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 2rem;
+        }
+        .flashcard-canvas {
+            min-height: calc(100vh - 180px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation (Shell Minimalist) -->
+<header class="fixed top-0 left-0 w-full h-16 bg-surface-container-lowest flex items-center px-margin-desktop z-50">
+<div class="flex justify-between items-center w-full max-w-container-max mx-auto">
+<nav class="flex items-center space-x-2 text-on-surface-variant font-label-md text-label-md">
+<span class="hover:text-primary transition-colors cursor-pointer">Interview</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="hover:text-primary transition-colors cursor-pointer">Database</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface font-semibold">Transaction</span>
+</nav>
+<div class="font-label-md text-label-md text-on-surface-variant bg-surface-container rounded-full px-4 py-1.5 border border-outline-variant">
+                Question <span class="text-primary font-bold">7</span> of 42
+            </div>
+<div class="flex items-center space-x-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">close</button>
+</div>
+</div>
+</header>
+<!-- Main Learning Canvas -->
+<main class="pt-16 pb-24 px-margin-desktop w-full max-w-container-max mx-auto flashcard-canvas flex flex-col items-center text-center justify-center">
+<!-- Question Section -->
+<section class="w-full max-w-3xl space-y-space-lg"><h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight leading-snug">What is a Database Transaction?</h1><div class="w-24 h-1 bg-primary/20 mx-auto rounded-full"></div><div class="pt-space-md"><button class="bg-surface-container hover:bg-outline-variant text-on-surface font-title-lg text-title-lg px-12 py-5 rounded-xl border border-outline-variant transition-all active:scale-[0.98] shadow-sm hover:shadow-md" id="toggle-btn" onclick="toggleAnswer()">Hide Answer</button></div><div class="answer-reveal active" id="answer-container"><p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed px-space-md border-l-4 border-primary/40 text-left bg-surface-container-low py-space-md rounded-r-lg">ATP (Adenosine Triphosphate) acts as the primary energy carrier in all living organisms, providing the energy necessary for various cellular processes like muscle contraction, nerve impulse propagation, and chemical synthesis.</p><div class="my-space-xl border-t border-outline-variant opacity-40"></div><div class="space-y-space-lg" id="evaluation-section"><h2 class="font-title-lg text-title-lg text-on-surface text-left">Self Evaluation</h2><div class="flex flex-col space-y-4" id="evaluation-bar"><button class="w-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md px-6 py-5 rounded-xl border border-outline-variant transition-colors flex items-center justify-center space-x-2"><span class="text-[24px]">😞</span><span class="font-semibold">Fail</span></button><button class="w-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md px-6 py-5 rounded-xl border border-outline-variant transition-colors flex items-center justify-center space-x-2"><span class="text-[24px]">😐</span><span class="font-semibold">Partial Success</span></button><button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md px-8 py-5 rounded-xl shadow-lg shadow-primary/10 transition-all flex items-center justify-center space-x-2 active:scale-95"><span class="text-[24px]">😄</span><span class="font-semibold">Success</span></button></div></div></div></section>
+</main>
+<!-- Evaluation Bar & Progress (Shell Bottom) -->
+<footer class="fixed bottom-0 left-0 w-full bg-surface-container-lowest z-50">
+<!-- Main Controls -->
+<div class="w-full max-w-container-max mx-auto px-margin-desktop py-6 flex items-center justify-between">
+<!-- Previous Button -->
+<button class="flex items-center space-x-2 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-all active:scale-90 group">
+<span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<span class="">Previous</span>
+</button>
+<!-- Evaluation Actions -->
+<!-- Next Button -->
+<button class="flex items-center space-x-2 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-all active:scale-90 group">
+<span class="">Next</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface-container-highest relative">
+<!-- Progress Label Tooltip style -->
+<div class="absolute -top-6 left-[34%] -translate-x-1/2 text-[10px] font-bold text-primary bg-primary-fixed px-2 py-0.5 rounded-full">
+                17 / 50 Completed
+            </div>
+<!-- Progress Fill -->
+<div class="h-full bg-primary w-[34%] transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(0,88,190,0.4)]"></div>
+</div>
+</footer>
+<!-- Background Ornament -->
+<div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[800px] h-[800px] bg-primary-fixed/10 blur-[120px] rounded-full pointer-events-none"></div>
+<script>
+        function toggleAnswer() {
+            const container = document.getElementById('answer-container');
+            const btn = document.getElementById('toggle-btn');
+            const evalBar = document.getElementById('evaluation-bar');
+            
+            const isActive = container.classList.toggle('active');
+            
+            if (isActive) {
+                btn.innerText = 'Hide Answer';
+                btn.classList.remove('bg-surface-container-highest');
+                btn.classList.add('bg-surface-container');
+                
+                // Reveal evaluation bar
+                evalBar.classList.remove('opacity-40', 'pointer-events-none', 'translate-y-2');
+            } else {
+                btn.innerText = 'Show Answer';
+                btn.classList.add('bg-surface-container-highest');
+                btn.classList.remove('bg-surface-container');
+                
+                // Hide evaluation bar
+                evalBar.classList.add('opacity-40', 'pointer-events-none', 'translate-y-2');
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleAnswer();
+            }
+        });
+    </script>
+</body></html>

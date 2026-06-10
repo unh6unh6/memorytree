@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Memory Tree - Computer Science Questions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"secondary-fixed": "#d3e4fe", outline: "#727785", "on-surface": "#191c1e", "surface-container-highest": "#e0e3e5", "tertiary-fixed-dim": "#ffb786", tertiary: "#924700", "surface-variant": "#e0e3e5", "on-secondary-fixed": "#0b1c30", "surface-tint": "#005ac2", "on-secondary": "#ffffff", "primary-fixed-dim": "#adc6ff", "tertiary-fixed": "#ffdcc6", surface: "#f7f9fb", "on-error": "#ffffff", "inverse-on-surface": "#eff1f3", "surface-dim": "#d8dadc", primary: "#0058be", "on-error-container": "#93000a", "surface-container-lowest": "#ffffff", "on-tertiary-container": "#fffbff", "on-primary-container": "#fefcff", secondary: "#505f76", background: "#f7f9fb", "surface-container": "#eceef0", "on-surface-variant": "#424754", "surface-container-high": "#e6e8ea", "inverse-primary": "#adc6ff", "secondary-fixed-dim": "#b7c8e1", "on-secondary-fixed-variant": "#38485d", "on-primary": "#ffffff", "on-secondary-container": "#54647a", "primary-container": "#2170e4", "on-background": "#191c1e", "on-primary-fixed": "#001a42", "surface-bright": "#f7f9fb", "surface-container-low": "#f2f4f6", "primary-fixed": "#d8e2ff", "on-tertiary": "#ffffff", "error-container": "#ffdad6", "on-primary-fixed-variant": "#004395", "inverse-surface": "#2d3133", "secondary-container": "#d0e1fb", "outline-variant": "#c2c6d6", "on-tertiary-fixed-variant": "#723600", error: "#ba1a1a", "tertiary-container": "#b75b00", "on-tertiary-fixed": "#311400"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"space-sm": "8px", "container-max": "1280px", unit: "4px", "space-md": "16px", "space-lg": "24px", "space-xl": "40px", "margin-mobile": "16px", gutter: "24px", "space-xs": "4px", "margin-desktop": "64px"}, fontFamily: {"title-lg": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "headline-lg": ["Inter"], "display-lg": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-lg-mobile": ["Inter"], headline: ["Inter"], display: ["Inter"], body: ["Inter"], label: ["Inter"]}, fontSize: {"title-lg": ["20px", {lineHeight: "1.4", fontWeight: "500"}], "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "1.5", fontWeight: "400"}], "headline-lg": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600"}], "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700"}], "body-lg": ["16px", {lineHeight: "1.6", fontWeight: "400"}], "label-md": ["12px", {lineHeight: "1", letterSpacing: "0.01em", fontWeight: "500"}], "headline-lg-mobile": ["28px", {lineHeight: "1.2", fontWeight: "600"}]}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .tree-node-active {
+            border-left: 3px solid #0058be;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">Memory Tree</span>
+<div class="hidden md:flex ml-8 gap-6 h-full items-center">
+<a class="font-title-lg text-title-lg text-primary font-bold border-b-2 border-primary h-16 flex items-center" href="#">Explorer</a>
+<a class="font-title-lg text-title-lg text-on-surface-variant hover:bg-surface-container transition-colors px-2 rounded-lg" href="#">Library</a>
+</div>
+</div>
+<div class="flex items-center gap-space-lg">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md w-64 focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="Search knowledge..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container rounded-full" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container rounded-full" data-icon="settings">settings</span>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-title-lg text-title-lg shadow-sm hover:opacity-90 transition-all">Create New</button>
+</div>
+</div>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 flex flex-col p-space-md bg-surface-container-low border-r border-outline-variant z-40">
+<div class="mb-6 px-2">
+<h2 class="text-label-md font-label-md uppercase tracking-wider text-outline mb-4">My Knowledge Tree</h2>
+<nav class="space-y-1">
+<div class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="folder">folder</span>
+<span class="text-body-md font-body-md">Personal Projects</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-primary bg-secondary-container rounded-lg border-l-4 border-primary cursor-pointer">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="text-body-md font-body-md">Computer Science</span>
+</div>
+<div class="ml-4 space-y-1 mt-1 border-l border-outline-variant/30 pl-2">
+<div class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-[18px]" data-icon="folder_open">folder_open</span>
+<span class="text-body-md font-body-md">Data Structures</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-[18px]" data-icon="folder_open">folder_open</span>
+<span class="text-body-md font-body-md">Algorithms</span>
+</div>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="folder">folder</span>
+<span class="text-body-md font-body-md">History</span>
+</div>
+</nav>
+</div>
+<div class="mt-auto border-t border-outline-variant pt-4 space-y-1">
+<div class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="text-body-md font-body-md">Help</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg cursor-pointer">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+<span class="text-body-md font-body-md">Trash</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 mt-16 p-space-lg min-h-screen">
+<div class="max-w-[1280px] mx-auto">
+<!-- Breadcrumb & Header -->
+<nav class="flex items-center gap-2 text-label-md font-label-md text-outline mb-2">
+<span class="">My Knowledge Tree</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-medium">Computer Science</span>
+</nav>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Computer Science</h1>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="border border-outline-variant text-on-surface-variant px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+    Start Test
+</button><button class="border border-outline-variant text-on-surface-variant px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+                        View Records
+                    </button>
+</div>
+</div>
+<!-- Stats Bar -->
+<!-- Toolbar -->
+<div class="flex flex-col sm:flex-row justify-between items-center bg-surface-container-lowest p-3 rounded-lg border border-outline-variant/50 mb-6 gap-4">
+<div class="flex items-center gap-4 w-full sm:w-auto">
+<div class="relative flex-grow sm:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 text-body-md border-outline-variant rounded-lg focus:border-primary focus:ring-1 focus:ring-primary" placeholder="Filter questions..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-body-md text-on-surface-variant">Sort by:</span>
+<select class="border-outline-variant rounded-lg text-body-md py-2 pl-3 pr-8 focus:ring-primary focus:border-primary">
+<option>Most Recent</option>
+<option>Importance</option>
+<option>Success Rate</option>
+</select>
+</div>
+</div>
+<!-- Content Sections -->
+<div class="space-y-10">
+<!-- Section 1: Data Structures -->
+<section>
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-outline-variant/20">
+<div class="flex items-center gap-3">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Data Structures</h3>
+<p class="text-label-md text-outline">CS &gt; Data Structures • 12 Questions</p>
+</div>
+</div>
+</div>
+<!-- Question Grid -->
+<div class="grid grid-cols-1 gap-6">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all">
+<div class="flex justify-between items-start">
+<h4 class="font-headline-md text-headline-md text-on-surface">What is a Binary Search Tree?</h4>
+<div class="flex gap-0.5 text-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg border-l-4 border-primary">
+<p class="text-body-lg text-on-surface-variant leading-relaxed italic">"A node-based binary tree data structure where the left subtree contains only nodes with keys lesser than the node's key, and the right subtree contains only nodes with keys greater than the node's key."</p>
+</div><div class="flex gap-4 mt-2 px-1">
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span class="">Last solved: 2024.05.20</span>
+</div>
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span class="">Last result: 😄 Success</span>
+</div>
+</div>
+<div class="flex justify-end gap-4 pt-2 border-t border-outline-variant/10">
+<button class="text-label-md text-outline hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">edit</span> Edit Note</button>
+<button class="text-label-md text-outline hover:text-error flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">delete</span> Remove</button>
+</div>
+</div>
+<!-- Card 2 (In the same section) -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"><div class="flex justify-between items-start">
+<h4 class="font-headline-md text-headline-md text-on-surface">Explain Hash Collision handling.</h4>
+<div class="flex gap-0.5 text-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">star</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg border-l-4 border-primary">
+<p class="text-body-lg text-on-surface-variant leading-relaxed italic">"Collisions occur when different keys result in the same hash index. Common handling methods include Chaining (using linked lists) and Open Addressing (linear probing, quadratic probing, or double hashing)."</p>
+</div><div class="flex gap-4 mt-2 px-1">
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span class="">Last solved: 2024.05.18</span>
+</div>
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">history</span>
+<span class="">Last result: 😐 Partial Success</span>
+</div>
+</div>
+<div class="flex justify-end gap-4 pt-2 border-t border-outline-variant/10">
+<button class="text-label-md text-outline hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">edit</span> Edit Note</button>
+<button class="text-label-md text-outline hover:text-error flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">delete</span> Remove</button>
+</div></div>
+</div>
+</section>
+<!-- Section 2: Algorithms -->
+<section>
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-outline-variant/20">
+<div class="flex items-center gap-3">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Algorithms</h3>
+<p class="text-label-md text-outline">CS &gt; Algorithms • 30 Questions</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"><div class="flex justify-between items-start">
+<h4 class="font-headline-md text-headline-md text-on-surface">Time complexity of Merge Sort?</h4>
+<div class="flex gap-0.5 text-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">star</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg border-l-4 border-primary">
+<p class="text-body-lg text-on-surface-variant leading-relaxed italic">"O(n log n) in all cases (worst, average, best). It is a stable, divide-and-conquer algorithm that requires O(n) additional space for the merging process."</p>
+</div><div class="flex gap-4 mt-2 px-1">
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span class="">Last solved: 2024.05.15</span>
+</div>
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">cancel</span>
+<span class="">Last result: 😞 Fail</span>
+</div>
+</div>
+<div class="flex justify-end gap-4 pt-2 border-t border-outline-variant/10">
+<button class="text-label-md text-outline hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">edit</span> Edit Note</button>
+<button class="text-label-md text-outline hover:text-error flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">delete</span> Remove</button>
+</div></div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-6 space-y-4 shadow-sm hover:shadow-md transition-all"><div class="flex justify-between items-start">
+<h4 class="font-headline-md text-headline-md text-on-surface">Dijkstra's Algorithm Overview</h4>
+<div class="flex gap-0.5 text-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg border-l-4 border-primary">
+<p class="text-body-lg text-on-surface-variant leading-relaxed italic">"Finds the shortest paths from a single source to all other nodes in a weighted graph with non-negative edge weights. It uses a greedy approach and a priority queue to maintain the set of unvisited nodes."</p>
+</div><div class="flex gap-4 mt-2 px-1">
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span class="">Last solved: Not solved yet</span>
+</div>
+<div class="flex items-center gap-1 text-label-md text-outline">
+<span class="material-symbols-outlined text-[14px]">pending</span>
+<span class="">Last result: Not solved yet</span>
+</div>
+</div>
+<div class="flex justify-end gap-4 pt-2 border-t border-outline-variant/10">
+<button class="text-label-md text-outline hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">edit</span> Edit Note</button>
+<button class="text-label-md text-outline hover:text-error flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">delete</span> Remove</button>
+</div></div>
+</div>
+</section>
+</div>
+<!-- Empty State / Footer Helper -->
+<div class="mt-12 flex justify-center py-12 border-t border-outline-variant/10">
+<div class="text-center">
+<p class="text-on-surface-variant font-medium">Keep growing your Memory Tree.</p>
+<p class="text-body-md text-outline">Every recall session strengthens the neural nodes of your knowledge base.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button for Mobile -->
+<div class="md:hidden fixed bottom-6 right-6">
+<button class="bg-primary text-on-primary w-14 h-14 rounded-full shadow-xl flex items-center justify-center hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+</div>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('.material-symbols-outlined[data-icon="expand_more"]').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const section = this.closest('section');
+                const content = section.querySelector('.grid');
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    this.style.transform = 'rotate(0deg)';
+                } else {
+                    content.classList.add('hidden');
+                    this.style.transform = 'rotate(-90deg)';
+                }
+                this.style.transition = 'transform 0.2s ease';
+            });
+        });
+
+        // Search Input Animation
+        const searchInput = document.querySelector('input[placeholder="Filter questions..."]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+</body></html>

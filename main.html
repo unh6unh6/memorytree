@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-variant": "#e0e3e5", "secondary-container": "#d0e1fb", "secondary-fixed": "#d3e4fe", "tertiary-fixed-dim": "#ffb786", background: "#f7f9fb", "on-secondary-fixed": "#0b1c30", "secondary-fixed-dim": "#b7c8e1", secondary: "#505f76", "on-primary-fixed": "#001a42", "inverse-on-surface": "#eff1f3", "inverse-primary": "#adc6ff", "tertiary-fixed": "#ffdcc6", "on-surface": "#191c1e", "on-secondary-container": "#54647a", "surface-dim": "#d8dadc", "surface-container-highest": "#e0e3e5", "on-tertiary-fixed-variant": "#723600", "on-secondary": "#ffffff", "on-error-container": "#93000a", outline: "#727785", "error-container": "#ffdad6", "primary-fixed": "#d8e2ff", "on-tertiary": "#ffffff", surface: "#f7f9fb", "inverse-surface": "#2d3133", "primary-fixed-dim": "#adc6ff", "on-primary-fixed-variant": "#004395", "surface-tint": "#005ac2", "outline-variant": "#c2c6d6", "surface-container": "#eceef0", "on-tertiary-container": "#fffbff", "surface-container-lowest": "#ffffff", "tertiary-container": "#b75b00", "on-tertiary-fixed": "#311400", primary: "#0058be", "surface-container-low": "#f2f4f6", "on-primary": "#ffffff", "primary-container": "#2170e4", "on-error": "#ffffff", "on-secondary-fixed-variant": "#38485d", tertiary: "#924700", "on-primary-container": "#fefcff", "surface-bright": "#f7f9fb", error: "#ba1a1a", "on-background": "#191c1e", "on-surface-variant": "#424754", "surface-container-high": "#e6e8ea"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {"margin-desktop": "64px", unit: "4px", "margin-mobile": "16px", "container-max": "1280px", gutter: "24px", "space-xs": "4px", "space-lg": "24px", "space-xl": "40px", "space-sm": "8px", "space-md": "16px"}, fontFamily: {"headline-lg-mobile": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "display-lg": ["Inter"], "title-lg": ["Inter"], "headline-lg": ["Inter"], "label-md": ["Inter"], headline: ["Inter"], display: ["Inter"], body: ["Inter"], label: ["Inter"]}, fontSize: {"headline-lg-mobile": ["28px", {lineHeight: "1.2", fontWeight: "600"}], "body-md": ["14px", {lineHeight: "1.5", fontWeight: "400"}], "body-lg": ["16px", {lineHeight: "1.6", fontWeight: "400"}], "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "600"}], "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700"}], "title-lg": ["20px", {lineHeight: "1.4", fontWeight: "500"}], "headline-lg": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600"}], "label-md": ["12px", {lineHeight: "1", letterSpacing: "0.01em", fontWeight: "500"}]}}}};</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .node-canvas {
+      background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .curve-path {
+      fill: none;
+      stroke: #cbd5e1;
+      stroke-width: 1.5;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+    }
+    /* Simple hover animation for buttons */
+    .btn-hover { transition: transform 0.1s ease; }
+    .btn-hover:active { transform: scale(0.95); }
+  </style>
+</head>
+<body class="bg-background text-on-surface h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar Implementation from JSON -->
+<header class="flex justify-between items-center w-full px-6 h-16 sticky top-0 z-50 bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-4">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary cursor-pointer active:scale-95 transition-transform">Memory Tree</div>
+<div class="hidden md:flex items-center bg-surface-container-high rounded-full px-4 py-1.5 gap-2 ml-4">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-64" placeholder="Search knowledge..." type="text"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar Implementation from JSON (adapted for 25% Left Sidebar Workspace) -->
+<aside class="w-1/4 h-full bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant dark:border-outline flex flex-col z-40 transition-all duration-200 ease-in-out">
+<div class="p-4 border-b border-outline-variant">
+<div class="font-title-lg text-title-lg font-semibold text-on-surface">Knowledge Graph</div>
+<div class="font-label-md text-label-md text-on-surface-variant">V3 Revision</div>
+</div>
+<!-- Tree Explorer Section -->
+<div class="flex-1 overflow-y-auto py-2 custom-scrollbar">
+<!-- Root -->
+<div class="px-4 py-2 flex items-center gap-2 font-bold text-primary dark:text-primary-fixed-dim bg-secondary-container/30 rounded-lg mx-2 transition-all duration-200">
+<span class="material-symbols-outlined text-sm">folder_open</span>
+<span class="font-label-md text-label-md">My Knowledge Tree</span>
+</div>
+<!-- Category: CS -->
+<div class="mt-1">
+<div class="group px-6 py-1.5 flex items-center justify-between hover:bg-surface-container-highest transition-colors cursor-pointer text-on-surface-variant" style="transform: translateY(0px);">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">expand_more</span>
+<span class="material-symbols-outlined text-sm">folder</span>
+<span class="font-label-md text-label-md">Computer Science</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-secondary-container rounded">
+<span class="material-symbols-outlined text-xs">add</span>
+</button>
+</div>
+<!-- Nodes -->
+<div class="pl-12">
+<div class="group py-1.5 flex items-center justify-between hover:bg-surface-container-highest transition-colors cursor-pointer text-on-surface-variant" style="transform: translateY(0px);">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">description</span>
+<span class="font-label-md text-label-md">Data Structures</span>
+</div>
+</div>
+<div class="group py-1.5 flex items-center justify-between text-primary font-medium bg-primary-container/10 border-l-2 border-primary transition-colors cursor-pointer" style="transform: translateY(0px);">
+<div class="flex items-center gap-2 pl-[-2px]">
+<span class="material-symbols-outlined text-sm">quiz</span>
+<span class="font-label-md text-label-md">Binary Search</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Category: Biology -->
+<div class="mt-1">
+<div class="group px-6 py-1.5 flex items-center justify-between hover:bg-surface-container-highest transition-colors cursor-pointer text-on-surface-variant" style="transform: translateY(0px);">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="material-symbols-outlined text-sm">folder</span>
+<span class="font-label-md text-label-md">Biology</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-secondary-container rounded">
+<span class="material-symbols-outlined text-xs">add</span>
+</button>
+</div>
+</div>
+<!-- Category: History -->
+<div class="mt-1">
+<div class="group px-6 py-1.5 flex items-center justify-between hover:bg-surface-container-highest transition-colors cursor-pointer text-on-surface-variant" style="transform: translateY(0px);">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="material-symbols-outlined text-sm">folder</span>
+<span class="font-label-md text-label-md">History</span>
+</div>
+<button class="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-secondary-container rounded">
+<span class="material-symbols-outlined text-xs">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- SideNav CTA & Footer -->
+<div class="p-4 border-t border-outline-variant space-y-2">
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span> Add Node
+        </button>
+<div class="flex items-center justify-between pt-2">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">help</span>
+<span class="font-label-md text-label-md">Help</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Canvas (75%) -->
+<main class="flex-1 relative node-canvas overflow-hidden flex items-center justify-center">
+<!-- Graph Background Connections -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg"><path class="curve-path" d="M 50% 50% C 45% 50%, 40% 40%, calc(50% - 210px + 100px) 300px" style="stroke-width: 2; stroke: rgb(203, 213, 225); stroke-linecap: round; transition: 0.3s;"></path><path class="curve-path" d="M 50% 50% C 55% 50%, 60% 40%, calc(50% + 210px - 100px) 300px" style="stroke-width: 2; stroke: rgb(203, 213, 225); stroke-linecap: round; transition: 0.3s;"></path><path class="curve-path" d="M 50% 50% C 55% 50%, 60% 60%, calc(50% + 210px - 100px) 500px" style="stroke-width: 2; stroke: rgb(203, 213, 225); stroke-linecap: round; transition: 0.3s;"></path><path class="curve-path" d="M calc(50% + 210px + 100px) 300px C calc(50% + 300px) 300px, calc(50% + 350px) 250px, calc(50% + 400px - 100px) 250px" style="stroke-width: 2; stroke: rgb(203, 213, 225); stroke-linecap: round; transition: 0.3s;"></path></svg>
+<!-- Center Root Node -->
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-xl z-20 relative group" style="transform: translateY(0px);">
+<span class="material-symbols-outlined text-3xl">account_tree</span>
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap font-title-lg text-title-lg font-bold text-on-surface">My Knowledge Tree</div>
+<button class="absolute -right-4 -top-4 w-8 h-8 bg-white border border-outline-variant rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+<!-- Category Node: CS -->
+<div class="absolute top-[300px] left-[calc(50%+210px)] -translate-x-1/2 -translate-y-1/2">
+<div class="px-6 py-3 bg-white border border-outline-variant rounded-xl shadow-sm flex items-center gap-3 group hover:border-primary transition-all cursor-pointer" style="transform: translateY(0px);">
+<div class="w-8 h-8 rounded-lg bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">folder</span>
+</div>
+<div class="font-body-lg text-body-lg font-semibold">Computer Science</div>
+<button class="w-6 h-6 rounded-full bg-surface-container flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-xs">add</span>
+</button>
+</div>
+</div>
+<!-- QA Node: Binary Search (Selected) -->
+<div class="absolute top-[250px] left-[calc(50%+400px)] -translate-x-1/2 -translate-y-1/2">
+<div class="px-6 py-3 bg-white border-2 border-primary rounded-xl shadow-lg flex items-center gap-3 animate-pulse-once">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined text-lg">quiz</span>
+</div>
+<div class="font-body-lg text-body-lg font-semibold text-primary">Binary Search</div>
+<div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-xs">add</span>
+</div>
+</div>
+<!-- Floating Detail Panel (Near selected node) -->
+<div class="absolute top-16 left-0 w-64 glass-panel border border-outline-variant rounded-xl p-4 shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h4 class="font-title-lg text-title-lg font-bold">Binary Search</h4>
+<p class="text-xs font-label-md text-on-surface-variant">Node Type: <span class="text-primary font-bold">QA</span></p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error transition-colors">delete</span>
+</div>
+<div class="space-y-3">
+<div class="bg-surface-container-low p-2 rounded border border-outline-variant/30">
+<p class="font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Memory Strength</p>
+<div class="w-full bg-outline-variant h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-primary text-on-primary rounded font-label-md text-label-md hover:bg-primary-container transition-colors">Edit Node</button>
+<button class="px-3 py-2 border border-outline text-on-surface rounded font-label-md text-label-md hover:bg-surface-container transition-colors">View Card</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Category Node: Biology -->
+<div class="absolute top-[500px] left-[calc(50%+210px)] -translate-x-1/2 -translate-y-1/2 opacity-60">
+<div class="px-6 py-3 bg-white border border-outline-variant rounded-xl shadow-sm flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">folder</span>
+</div>
+<div class="font-body-lg text-body-lg font-semibold">Biology</div>
+</div>
+</div>
+<!-- Category Node: History -->
+<div class="absolute top-[300px] left-[calc(50%-210px)] -translate-x-1/2 -translate-y-1/2 opacity-60">
+<div class="px-6 py-3 bg-white border border-outline-variant rounded-xl shadow-sm flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">folder</span>
+</div>
+<div class="font-body-lg text-body-lg font-semibold">History</div>
+</div>
+</div>
+<!-- Interaction Overlay -->
+<div class="absolute bottom-8 right-8 flex flex-col gap-3">
+<button class="w-12 h-12 rounded-full bg-white border border-outline-variant shadow-lg flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-white border border-outline-variant shadow-lg flex items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-primary text-on-primary shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">center_focus_strong</span>
+</button>
+</div>
+</main>
+</div>
+<script>
+    // Micro-interactions for the canvas nodes
+    document.querySelectorAll('.group').forEach(node => {
+      node.addEventListener('mouseenter', () => {
+        node.style.transform = 'translateY(-2px)';
+      });
+      node.addEventListener('mouseleave', () => {
+        node.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Handle sidebar expansion/contraction logic if needed
+    // Simple tree toggle effect simulated
+    const treeItems = document.querySelectorAll('.group');
+    treeItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        const icon = item.querySelector('.material-symbols-outlined');
+        if (icon && (icon.innerText === 'expand_more' || icon.innerText === 'chevron_right')) {
+          icon.innerText = icon.innerText === 'expand_more' ? 'chevron_right' : 'expand_more';
+        }
+      });
+    });
+  </script>
+</body></html>
