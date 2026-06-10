@@ -101,11 +101,13 @@
 /* ── Sidebar ── */
 .sidebar {
   width: var(--sidebar-width);
+  min-width: 160px;
+  max-width: 500px;
   height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--color-surface-container-lowest);
-  border-right: var(--border);
+  border-right: none;
   overflow: hidden;
   flex-shrink: 0;
   z-index: var(--z-sidebar);
@@ -223,12 +225,223 @@
   font-size: var(--font-size-body-md);
 }
 
-/* ── Canvas Area (Phase 4에서 채워짐) ── */
+/* ── Canvas Area ── */
 .canvas-area {
   flex: 1;
   overflow: hidden;
   position: relative;
   background: var(--color-surface);
+  background-image: radial-gradient(#d4d8e0 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Canvas Controls (zoom buttons) ── */
+.canvas-controls {
+  position: absolute;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: var(--z-dropdown);
+}
+
+.canvas-ctrl-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: var(--border);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.canvas-ctrl-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.canvas-ctrl-btn:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.canvas-ctrl-btn:active {
+  transform: scale(0.9);
+}
+
+.canvas-ctrl-btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(0, 88, 190, 0.35);
+}
+
+.canvas-ctrl-btn--primary:hover {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+  border-color: transparent;
+}
+
+/* ── Canvas Floating Panel ── */
+.canvas-panel {
+  position: absolute;
+  width: 240px;
+  background: rgba(255, 255, 255, 0.93);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-4);
+  z-index: var(--z-dropdown);
+  animation: mt-fadeIn var(--transition-fast) ease;
+}
+
+.canvas-panel__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-on-surface-variant);
+  border-radius: var(--radius-sm);
+  padding: 0;
+  transition: background-color var(--transition-fast);
+}
+
+.canvas-panel__close:hover {
+  background: var(--color-surface-container-high);
+}
+
+.canvas-panel__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.canvas-panel__header {
+  padding-right: var(--space-6);
+  margin-bottom: var(--space-3);
+}
+
+.canvas-panel__name {
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface);
+  word-break: break-word;
+  margin-bottom: var(--space-1);
+  line-height: var(--line-height-normal);
+}
+
+.canvas-panel__type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.canvas-panel__type-badge--category {
+  background: var(--color-surface-container);
+  color: var(--color-on-surface-variant);
+}
+
+.canvas-panel__type-badge--qa {
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+}
+
+.canvas-panel__memory {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-container-low);
+  border-radius: var(--radius-md);
+}
+
+.canvas-panel__memory-label {
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.canvas-panel__memory-track {
+  flex: 1;
+  height: 4px;
+  background: var(--color-outline-variant);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.canvas-panel__memory-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+.canvas-panel__memory-pct {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.canvas-panel__actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.canvas-panel__action-btn {
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-label-md);
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Canvas SVG node hover: show add button ── */
+.canvas-add-btn {
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+[data-role="node"]:hover .canvas-add-btn {
+  opacity: 1;
+}
+
+/* ── Node type selection cards ── */
+.node-type-card {
+  border: 2px solid var(--color-outline-variant);
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.node-type-card--active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-fixed);
 }
 
 /* ── Modal ── */
@@ -509,4 +722,83 @@
   resize: vertical;
   min-height: 100px;
   line-height: var(--line-height-relaxed);
+}
+
+/* ── Sidebar Context Panel (우클릭 메뉴) ── */
+.sidebar-ctx-panel {
+  position: fixed;
+  width: 180px;
+  background: var(--color-surface-container-lowest);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-dropdown);
+  padding: 4px 0;
+  animation: mt-fadeIn var(--transition-fast) ease;
+  overflow: hidden;
+}
+
+.sidebar-ctx-panel__name {
+  padding: 8px 12px 2px;
+  font-size: var(--font-size-body-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-ctx-panel__type {
+  padding: 0 12px 6px;
+  font-size: var(--font-size-label-md);
+  color: var(--color-on-surface-variant);
+}
+
+.sidebar-ctx-panel__divider {
+  border: none;
+  border-top: var(--border);
+  margin: 4px 0;
+}
+
+.sidebar-ctx-panel__item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-md);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-on-surface);
+  transition: background-color var(--transition-fast);
+}
+
+.sidebar-ctx-panel__item:hover {
+  background: var(--color-surface-container-high);
+}
+
+.sidebar-ctx-panel__item--danger {
+  color: var(--color-error);
+}
+
+.sidebar-ctx-panel__item--danger:hover {
+  background: var(--color-error-container);
+  color: var(--color-on-error-container);
+}
+
+/* ── Sidebar Resizer ── */
+.sidebar-resizer {
+  width: 4px;
+  background: transparent;
+  cursor: col-resize;
+  position: relative;
+  z-index: var(--z-sidebar);
+  flex-shrink: 0;
+  transition: background-color 200ms;
+}
+
+.sidebar-resizer:hover,
+.sidebar-resizer--active {
+  background: var(--color-primary);
 }
