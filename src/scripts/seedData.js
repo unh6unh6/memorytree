@@ -1,16 +1,26 @@
-import { nodeService } from './storage.js';
+import { nodeService, initRootNode, ROOT_NODE_ID } from './storage.js';
 
-const SEED_KEY = 'mt_seeded';
+const SEED_KEY = 'mt_seeded_v2';
+const OLD_SEED_KEY = 'mt_seeded';
 
 /**
  * 최초 실행 시 한 번만 샘플 데이터를 삽입한다.
- * LocalStorage에 mt_seeded 플래그가 없을 때만 실행된다.
+ * v1 seed(mt_seeded)가 감지되면 구 데이터를 초기화 후 재시드한다.
  */
 function seedIfEmpty() {
   if (localStorage.getItem(SEED_KEY)) return;
 
-  // ── Root
-  const cs = nodeService.addCategory({ name: 'CS', parentId: null });
+  // v1 → v2 마이그레이션: 구 seed 데이터 초기화 후 root 재생성
+  if (localStorage.getItem(OLD_SEED_KEY)) {
+    localStorage.removeItem(OLD_SEED_KEY);
+    localStorage.removeItem('mt_nodes');
+    localStorage.removeItem('mt_qa');
+    localStorage.removeItem('mt_attempts');
+    initRootNode();
+  }
+
+  // ── CS (root 하위)
+  const cs = nodeService.addCategory({ name: 'CS', parentId: ROOT_NODE_ID });
 
   // ── CS > Data Structures
   const ds = nodeService.addCategory({ name: 'Data Structures', parentId: cs.id });

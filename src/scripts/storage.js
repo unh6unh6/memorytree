@@ -1,5 +1,7 @@
 import { createTreeNode, createQANode, createAttempt } from './models.js';
 
+export const ROOT_NODE_ID = 'root';
+
 const KEYS = {
   nodes: 'mt_nodes',
   qa: 'mt_qa',
@@ -86,9 +88,13 @@ const nodeService = {
 
   /**
    * 노드와 그 하위 트리 전체 삭제.
+   * root 노드(ROOT_NODE_ID)는 삭제 불가.
    * @param {string} id
    */
   remove(id) {
+    if (id === ROOT_NODE_ID) {
+      throw new Error('root 노드는 삭제할 수 없습니다.');
+    }
     const nodes = this.getAll();
     const toDelete = this._collectDescendants(nodes, id);
     toDelete.forEach((nid) => {
@@ -197,4 +203,27 @@ const attemptService = {
   },
 };
 
-export { nodeService, qaService, attemptService };
+// ─── initRootNode ─────────────────────────────────────────────────────────────
+
+/**
+ * 앱 시작 시 root 노드('My Tree')가 없으면 자동 생성한다.
+ * seedData와 독립적으로 항상 호출되어야 한다.
+ * @returns {import('./models.js').TreeNode}
+ */
+function initRootNode() {
+  const nodes = load(KEYS.nodes) || {};
+  if (!nodes[ROOT_NODE_ID]) {
+    nodes[ROOT_NODE_ID] = {
+      id: ROOT_NODE_ID,
+      parentId: null,
+      name: 'My Tree',
+      type: 'category',
+      children: [],
+      createdAt: Date.now(),
+    };
+    save(KEYS.nodes, nodes);
+  }
+  return nodes[ROOT_NODE_ID];
+}
+
+export { nodeService, qaService, attemptService, initRootNode };

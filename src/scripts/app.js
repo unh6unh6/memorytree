@@ -1,11 +1,13 @@
 import router from './router.js';
+import { initRootNode } from './storage.js';
 import { seedIfEmpty } from './seedData.js';
 import * as navbar from './navbar.js';
 import * as sidebar from './sidebar.js';
 import * as modal from './modal.js';
 import * as toast from './toast.js';
 
-// 초기 데이터 삽입 (최초 1회)
+// root 노드 보장 → 샘플 데이터 삽입 (최초 1회)
+initRootNode();
 seedIfEmpty();
 
 // 공통 컴포넌트 초기화

@@ -15,6 +15,10 @@
   - `Attempt { id, nodeId, result: 1.0 | 0.5 | 0.0, timestamp }`
 - [x] LocalStorage CRUD 서비스 (`nodeService`, `attemptService`)
 - [x] 초기 샘플 데이터 (CS > Data Structures, Algorithms 예시 포함)
+- [x] 앱 시작 시 root 노드 초기화 보장
+  - `parentId: null, name: 'My Tree', type: 'category'`인 노드가 없으면 자동 생성
+  - seedData와 분리된 독립 로직 (`initRootNode`)으로 구현
+  - root 노드 ID를 고정 상수로 관리 (`ROOT_NODE_ID = 'root'`)
 
 ## Phase 3. 레이아웃 & 공통 컴포넌트
 
