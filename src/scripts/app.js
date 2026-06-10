@@ -7,6 +7,7 @@ import * as modal from './modal.js';
 import * as toast from './toast.js';
 import * as canvas from './canvas.js';
 import * as list from './list.js';
+import * as test from './test.js';
 
 // root 노드 보장 → 샘플 데이터 삽입 (최초 1회)
 initRootNode();
@@ -33,8 +34,7 @@ router.onRoute('list', (params) => {
 });
 
 router.onRoute('test', (params) => {
-  // Phase 6에서 구현
-  // params.nodeId, params.flipped
+  test.init(document.getElementById('test-container'), params);
 });
 
 router.init();

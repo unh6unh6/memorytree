@@ -263,7 +263,7 @@ function _bindContainerEvents() {
     }
 
     if (target.closest('#list-btn-test')) {
-      window.location.hash = `#test?nodeId=${_nodeId}&flipped=${_flipped}`;
+      window.location.hash = `#test?nodeId=${_nodeId}&flipped=${_flipped}&sort=${_sortBy}`;
       return;
     }
 
