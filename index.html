@@ -9,11 +9,41 @@
 <body>
   <div id="app">
 
-    <!-- Phase 3에서 상단 내비게이션 삽입 -->
+    <!-- 상단 내비게이션 바 -->
+    <nav class="navbar" id="navbar">
+      <div class="navbar__brand">
+        <svg class="navbar__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="navbar__title">Memory Tree</span>
+      </div>
+      <div class="navbar__search-wrapper">
+        <svg class="navbar__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="search"
+          class="navbar__search"
+          id="navbar-search"
+          placeholder="노드 검색..."
+          autocomplete="off"
+          aria-label="노드 검색"
+        />
+      </div>
+    </nav>
 
     <!-- Explorer 화면 -->
     <div class="view" data-view="explorer">
-      <!-- Phase 4에서 구현 -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__header">탐색기</div>
+        <div class="sidebar__body" id="sidebar-body"></div>
+      </aside>
+      <main class="canvas-area" id="canvas-area">
+        <!-- Phase 4에서 구현 -->
+      </main>
     </div>
 
     <!-- 질문/답변 모아보기 화면 -->
@@ -25,6 +55,26 @@
     <div class="view" data-view="test">
       <!-- Phase 6에서 구현 -->
     </div>
+
+    <!-- 공통 모달 -->
+    <div class="modal-backdrop" id="modal-backdrop" hidden>
+      <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal__header">
+          <h2 class="modal__title" id="modal-title"></h2>
+          <button class="modal__close" id="modal-close" aria-label="모달 닫기">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal__body" id="modal-body"></div>
+        <div class="modal__footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <!-- 토스트 알림 컨테이너 -->
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="false"></div>
 
   </div>
 
